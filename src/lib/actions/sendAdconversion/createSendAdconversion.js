@@ -21,6 +21,7 @@ module.exports =
       enableAdvertisingDisplay,
       enableAdvertisingCreative,
       transactionId,
+      customGoals,
       ...otherSettings 
     } = settings;
     const configOverrides = getConfigOverrides(otherSettings);
@@ -70,6 +71,11 @@ module.exports =
       // Add transaction ID if provided
       if (transactionId) {
         xdm.advertising.conversion.transactionID = transactionId;
+      }
+      
+      // Add custom goals if provided
+      if (customGoals && customGoals.length > 0) {
+        xdm.advertising.conversion.customGoals = customGoals;
       }
     }
 

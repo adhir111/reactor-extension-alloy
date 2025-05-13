@@ -15,6 +15,7 @@ import { object } from "yup";
 import instancePicker from "../forms/instancePicker";
 import checkbox from "../forms/checkbox";
 import textField from "../forms/textField";
+import fieldArray from "../forms/fieldArray";
 import form from "../forms/form";
 import renderForm from "../forms/renderForm";
 import configOverrides from "../forms/configOverrides";
@@ -30,6 +31,7 @@ const wrapGetInitialValues =
       enableAdvertisingDisplay = false,
       enableAdvertisingCreative = false,
       transactionId = "",
+      customGoals = [""],
       instanceName = initInfo.extensionSettings.instances[0].name,
       edgeConfigOverrides,
     } = initInfo.settings || {};
@@ -42,6 +44,7 @@ const wrapGetInitialValues =
           enableAdvertisingDisplay,
           enableAdvertisingCreative,
           transactionId,
+          customGoals,
           instanceName,
           edgeConfigOverrides,
         },
@@ -58,6 +61,7 @@ const wrapGetSettings =
       enableAdvertisingDisplay,
       enableAdvertisingCreative,
       transactionId,
+      customGoals,
       edgeConfigOverrides,
     } = getSettings({ values });
 
@@ -67,6 +71,7 @@ const wrapGetSettings =
       enableAdvertisingDisplay,
       enableAdvertisingCreative,
       transactionId,
+      customGoals,
       edgeConfigOverrides,
     };
   };
@@ -105,6 +110,14 @@ const transactionIdField = textField({
   description: "Enter the transaction ID for this conversion",
 });
 
+const customGoalsField = fieldArray({
+  name: "customGoals",
+  label: "Custom Goals",
+  singularLabel: "Custom Goal",
+  description: "Enter a custom goal to track with this conversion",
+  dataElementDescription: "Provide a data element that returns an array of strings representing custom goals"
+});
+
 const sendAdconversionForm = form(
   {
     wrapGetInitialValues,
@@ -131,7 +144,8 @@ const sendAdconversionForm = form(
         section(
           { label: "Conversion Properties" },
           [
-            transactionIdField
+            transactionIdField,
+            customGoalsField
           ]
         )
       ]

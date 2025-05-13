@@ -1052,6 +1052,12 @@ const createExtensionManifest = ({ version }) => {
             transactionId: {
               type: "string",
             },
+            customGoals: {
+              type: "array",
+              items: {
+                type: "string"
+              }
+            },
             edgeConfigOverrides: actionEdgeConfigOverridesSchema,
           },
           required: ["instanceName"],
