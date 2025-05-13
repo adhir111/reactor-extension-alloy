@@ -20,6 +20,7 @@ module.exports =
       enableAdvertisingSearch,
       enableAdvertisingDisplay,
       enableAdvertisingCreative,
+      transactionId,
       ...otherSettings 
     } = settings;
     const configOverrides = getConfigOverrides(otherSettings);
@@ -65,6 +66,11 @@ module.exports =
       xdm.advertising.conversion.creative = {
         enabled: true
       };
+      
+      // Add transaction ID if provided
+      if (transactionId) {
+        xdm.advertising.conversion.transactionID = transactionId;
+      }
     }
 
     const sendEventSettings = {

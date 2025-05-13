@@ -1049,6 +1049,9 @@ const createExtensionManifest = ({ version }) => {
             enableAdvertisingCreative: {
               type: "boolean",
             },
+            transactionId: {
+              type: "string",
+            },
             edgeConfigOverrides: actionEdgeConfigOverridesSchema,
           },
           required: ["instanceName"],

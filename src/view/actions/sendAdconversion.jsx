@@ -14,10 +14,12 @@ import { object } from "yup";
 
 import instancePicker from "../forms/instancePicker";
 import checkbox from "../forms/checkbox";
+import textField from "../forms/textField";
 import form from "../forms/form";
 import renderForm from "../forms/renderForm";
 import configOverrides from "../forms/configOverrides";
 import section from "../forms/section";
+import conditional from "../forms/conditional";
 import { FIELD_NAMES } from "../components/overrides/utils";
 
 const wrapGetInitialValues =
@@ -27,6 +29,7 @@ const wrapGetInitialValues =
       enableAdvertisingSearch = false,
       enableAdvertisingDisplay = false,
       enableAdvertisingCreative = false,
+      transactionId = "",
       instanceName = initInfo.extensionSettings.instances[0].name,
       edgeConfigOverrides,
     } = initInfo.settings || {};
@@ -38,6 +41,7 @@ const wrapGetInitialValues =
           enableAdvertisingSearch,
           enableAdvertisingDisplay,
           enableAdvertisingCreative,
+          transactionId,
           instanceName,
           edgeConfigOverrides,
         },
@@ -53,6 +57,7 @@ const wrapGetSettings =
       enableAdvertisingSearch,
       enableAdvertisingDisplay,
       enableAdvertisingCreative,
+      transactionId,
       edgeConfigOverrides,
     } = getSettings({ values });
 
@@ -61,6 +66,7 @@ const wrapGetSettings =
       enableAdvertisingSearch,
       enableAdvertisingDisplay,
       enableAdvertisingCreative,
+      transactionId,
       edgeConfigOverrides,
     };
   };
@@ -93,6 +99,12 @@ const enableAdvertisingCreativeField = checkbox({
   defaultValue: false,
 });
 
+const transactionIdField = textField({
+  name: "transactionId",
+  label: "Transaction ID",
+  description: "Enter the transaction ID for this conversion",
+});
+
 const sendAdconversionForm = form(
   {
     wrapGetInitialValues,
@@ -108,6 +120,20 @@ const sendAdconversionForm = form(
         enableAdvertisingSearchField,
         enableAdvertisingDisplayField,
         enableAdvertisingCreativeField,
+      ]
+    ),
+    conditional(
+      {
+        args: "enableAdvertisingCreative",
+        condition: (enableAdvertisingCreative) => enableAdvertisingCreative,
+      },
+      [
+        section(
+          { label: "Conversion Properties" },
+          [
+            transactionIdField
+          ]
+        )
       ]
     ),
     configOverrideFields,
