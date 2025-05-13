@@ -17,13 +17,16 @@ import checkbox from "../forms/checkbox";
 import form from "../forms/form";
 import renderForm from "../forms/renderForm";
 import configOverrides from "../forms/configOverrides";
+import section from "../forms/section";
 import { FIELD_NAMES } from "../components/overrides/utils";
 
 const wrapGetInitialValues =
   (getInitialValues) =>
   ({ initInfo }) => {
     const {
-      enableTracking = false,
+      enableAdvertisingSearch = false,
+      enableAdvertisingDisplay = false,
+      enableAdvertisingCreative = false,
       instanceName = initInfo.extensionSettings.instances[0].name,
       edgeConfigOverrides,
     } = initInfo.settings || {};
@@ -32,7 +35,9 @@ const wrapGetInitialValues =
       initInfo: {
         ...initInfo,
         settings: {
-          enableTracking,
+          enableAdvertisingSearch,
+          enableAdvertisingDisplay,
+          enableAdvertisingCreative,
           instanceName,
           edgeConfigOverrides,
         },
@@ -45,13 +50,17 @@ const wrapGetSettings =
   ({ values }) => {
     const {
       instanceName,
-      enableTracking,
+      enableAdvertisingSearch,
+      enableAdvertisingDisplay,
+      enableAdvertisingCreative,
       edgeConfigOverrides,
     } = getSettings({ values });
 
     return {
       instanceName,
-      enableTracking,
+      enableAdvertisingSearch,
+      enableAdvertisingDisplay,
+      enableAdvertisingCreative,
       edgeConfigOverrides,
     };
   };
@@ -63,10 +72,24 @@ const hideFields = [
 ];
 const configOverrideFields = configOverrides(hideFields);
 
-const enableTrackingField = checkbox({
-  name: "enableTracking",
-  label: "Enable Adconversion Tracking",
-  description: "Enable tracking of Adconversions through the Adobe Experience Platform Web SDK.",
+const enableAdvertisingSearchField = checkbox({
+  name: "enableAdvertisingSearch",
+  label: "Enable Advertising Search",
+  description: "Enabling Search will enable auto tracking of Click through event",
+  defaultValue: false,
+});
+
+const enableAdvertisingDisplayField = checkbox({
+  name: "enableAdvertisingDisplay",
+  label: "Enable Advertising Display",
+  description: "Enabling Display will enable auto tracking of Click through and View through events",
+  defaultValue: false,
+});
+
+const enableAdvertisingCreativeField = checkbox({
+  name: "enableAdvertisingCreative",
+  label: "Enable Advertising Creative-2.0",
+  description: "Enabling Creative-2.0 will enable auto tracking of conversion event",
   defaultValue: false,
 });
 
@@ -79,7 +102,14 @@ const sendAdconversionForm = form(
   },
   [
     instancePicker({ name: "instanceName" }),
-    enableTrackingField,
+    section(
+      { label: "Advertising Conversion Types" },
+      [
+        enableAdvertisingSearchField,
+        enableAdvertisingDisplayField,
+        enableAdvertisingCreativeField,
+      ]
+    ),
     configOverrideFields,
   ]
 );

@@ -1040,7 +1040,13 @@ const createExtensionManifest = ({ version }) => {
               type: "string",
               minLength: 1,
             },
-            enableTracking: {
+            enableAdvertisingSearch: {
+              type: "boolean",
+            },
+            enableAdvertisingDisplay: {
+              type: "boolean",
+            },
+            enableAdvertisingCreative: {
               type: "boolean",
             },
             edgeConfigOverrides: actionEdgeConfigOverridesSchema,

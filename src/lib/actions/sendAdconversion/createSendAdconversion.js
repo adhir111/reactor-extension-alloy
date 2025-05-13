@@ -15,7 +15,13 @@ const clone = require("../../utils/clone");
 module.exports =
   ({ instanceManager, sendEventCallbackStorage, getConfigOverrides }) =>
   (settings) => {
-    const { instanceName, enableTracking, ...otherSettings } = settings;
+    const { 
+      instanceName, 
+      enableAdvertisingSearch,
+      enableAdvertisingDisplay,
+      enableAdvertisingCreative,
+      ...otherSettings 
+    } = settings;
     const configOverrides = getConfigOverrides(otherSettings);
     
     const instance = instanceManager.getInstance(instanceName);
@@ -26,21 +32,40 @@ module.exports =
       );
     }
 
-    // Only send the event if tracking is enabled
-    if (!enableTracking) {
+    // Only proceed if at least one of the advertising types is enabled
+    if (!enableAdvertisingSearch && !enableAdvertisingDisplay && !enableAdvertisingCreative) {
       return Promise.resolve();
     }
 
-    // Create the XDM data for adconversion
+    // Create the base XDM data for adconversion
     const xdm = {
       eventType: "advertising.conversion",
       timestamp: new Date().toISOString(),
       advertising: {
         conversion: {
-          conversionComplete: true
+          conversionComplete: true,
         }
       }
     };
+
+    // Add specific advertising types that are enabled
+    if (enableAdvertisingSearch) {
+      xdm.advertising.conversion.search = {
+        enabled: true
+      };
+    }
+
+    if (enableAdvertisingDisplay) {
+      xdm.advertising.conversion.display = {
+        enabled: true
+      };
+    }
+
+    if (enableAdvertisingCreative) {
+      xdm.advertising.conversion.creative = {
+        enabled: true
+      };
+    }
 
     const sendEventSettings = {
       xdm,
