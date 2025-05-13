@@ -1029,6 +1029,31 @@ const createExtensionManifest = ({ version }) => {
         libPath: "dist/lib/actions/evaluateRulesets/index.js",
         viewPath: "actions/evaluateRulesets.html",
       },
+      {
+        displayName: "Send Adconversion",
+        name: "send-adconversion",
+        schema: {
+          $schema: "http://json-schema.org/draft-04/schema#",
+          type: "object",
+          properties: {
+            instanceName: {
+              type: "string",
+              minLength: 1,
+            },
+            enableTracking: {
+              type: "boolean",
+            },
+            edgeConfigOverrides: actionEdgeConfigOverridesSchema,
+          },
+          required: ["instanceName"],
+          additionalProperties: false,
+        },
+        transforms: [
+          ...actionEdgeConfigOverridesTransforms,
+        ],
+        libPath: "dist/lib/actions/sendAdconversion/index.js",
+        viewPath: "actions/sendAdconversion.html",
+      },
     ],
     events: [
       {
