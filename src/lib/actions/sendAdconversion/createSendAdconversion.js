@@ -17,6 +17,7 @@ module.exports =
   (settings) => {
     const { 
       instanceName, 
+      advertiserId,
       enableAdvertisingSearch,
       enableAdvertisingDisplay,
       enableAdvertisingCreative,
@@ -50,6 +51,11 @@ module.exports =
         }
       }
     };
+
+    // Add advertiser ID if provided
+    if (advertiserId) {
+      xdm.advertising.advertiserId = advertiserId;
+    }
 
     // Add specific advertising types that are enabled
     if (enableAdvertisingSearch) {

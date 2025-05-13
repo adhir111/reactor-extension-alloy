@@ -9,7 +9,7 @@ the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTA
 OF ANY KIND, either express or implied. See the License for the specific language
 governing permissions and limitations under the License.
 */
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { object } from "yup";
 
 import instancePicker from "../forms/instancePicker";
@@ -22,12 +22,72 @@ import renderForm from "../forms/renderForm";
 import configOverrides from "../forms/configOverrides";
 import section from "../forms/section";
 import conditional from "../forms/conditional";
+import comboBox from "../forms/comboBox";
 import { FIELD_NAMES } from "../components/overrides/utils";
+
+// Sample advertisers data from API response
+const MOCK_ADVERTISERS_DATA = [
+  { id: "167534", name: "test" },
+  { id: "167524", name: "Advertiser BF" },
+  { id: "168872", name: "CTV_DV" },
+  { id: "168724", name: "gdfg" },
+  { id: "168726", name: "gdfgf" },
+  { id: "167536", name: "test" },
+  { id: "168732", name: "test20240925" },
+  { id: "153472", name: "Uday Test Advisor" },
+  { id: "168725", name: "united" },
+  { id: "167535", name: "{{7*7}}" }
+];
+
+// Mock API function that simulates async fetch of advertisers
+// TODO: Replace this with actual API call to get advertisers
+const fetchAdvertisers = () => {
+  return new Promise((resolve) => {
+    // Simulate API delay
+    setTimeout(() => {
+      resolve(MOCK_ADVERTISERS_DATA);
+    }, 3500);
+  });
+};
+
+/* 
+TODO: Implement real API call to get advertisers list
+Replace the mock function with something like:
+
+const fetchAdvertisers = async () => {
+  try {
+    // Replace with actual API endpoint and authorization
+    const response = await fetch('https://api.tubemogul.com/v1/provisioning/accounts/{accountId}/advertisers?sort_by=name&sort_order=asc', {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer YOUR_TOKEN',
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch advertisers');
+    }
+    
+    const data = await response.json();
+    
+    // Transform API response to the format needed for the dropdown
+    return data.items.map(advertiser => ({
+      id: advertiser.advertiser_id,
+      name: advertiser.advertiser_name
+    }));
+  } catch (error) {
+    console.error('Error fetching advertisers:', error);
+    return []; // Return empty array on error
+  }
+};
+*/
 
 const wrapGetInitialValues =
   (getInitialValues) =>
   ({ initInfo }) => {
     const {
+      advertiserId = "",
       enableAdvertisingSearch = false,
       enableAdvertisingDisplay = false,
       enableAdvertisingCreative = false,
@@ -42,6 +102,7 @@ const wrapGetInitialValues =
       initInfo: {
         ...initInfo,
         settings: {
+          advertiserId,
           enableAdvertisingSearch,
           enableAdvertisingDisplay,
           enableAdvertisingCreative,
@@ -60,6 +121,7 @@ const wrapGetSettings =
   ({ values }) => {
     const {
       instanceName,
+      advertiserId,
       enableAdvertisingSearch,
       enableAdvertisingDisplay,
       enableAdvertisingCreative,
@@ -71,6 +133,7 @@ const wrapGetSettings =
 
     return {
       instanceName,
+      advertiserId,
       enableAdvertisingSearch,
       enableAdvertisingDisplay,
       enableAdvertisingCreative,
@@ -87,6 +150,71 @@ const hideFields = [
   FIELD_NAMES.targetPropertyTokenOverride,
 ];
 const configOverrideFields = configOverrides(hideFields);
+
+// Create advertiser field with async loading of options
+const advertiserField = {
+  getInitialValues({ initInfo }) {
+    const { advertiserId = "" } = initInfo.settings || {};
+    return { advertiserId };
+  },
+  getSettings({ values }) {
+    return {
+      advertiserId: values.advertiserId
+    };
+  },
+  validationShape: {
+    advertiserId: object(),
+  },
+  Component: ({ namePrefix = "" }) => {
+    const [advertisers, setAdvertisers] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+      let mounted = true;
+      
+      const loadAdvertisers = async () => {
+        try {
+          const data = await fetchAdvertisers();
+          if (mounted) {
+            setAdvertisers(data);
+            setIsLoading(false);
+          }
+        } catch (error) {
+          console.error("Error loading advertisers:", error);
+          if (mounted) {
+            setIsLoading(false);
+          }
+        }
+      };
+      
+      loadAdvertisers();
+      
+      return () => {
+        mounted = false;
+      };
+    }, []);
+
+    // Create placeholder item for loading state
+    const items = isLoading 
+      ? [{ value: "", label: "Loading advertisers..." }] 
+      : advertisers.map(advertiser => ({
+          value: advertiser.id,
+          label: advertiser.name
+        }));
+
+    // Create comboBox with loaded data
+    const advertiserComboBox = comboBox({
+      name: "advertiserId",
+      label: "Advertiser",
+      description: "Select the advertiser for this conversion",
+      items: items,
+      allowsCustomValue: false
+    });
+
+    // Render the combo box component
+    return <advertiserComboBox.Component namePrefix={namePrefix} isDisabled={isLoading} />;
+  }
+};
 
 const enableAdvertisingSearchField = checkbox({
   name: "enableAdvertisingSearch",
@@ -158,6 +286,7 @@ const sendAdconversionForm = form(
   },
   [
     instancePicker({ name: "instanceName" }),
+    advertiserField,
     section(
       { label: "Advertising Conversion Types" },
       [

@@ -1040,6 +1040,9 @@ const createExtensionManifest = ({ version }) => {
               type: "string",
               minLength: 1,
             },
+            advertiserId: {
+              type: "string",
+            },
             enableAdvertisingSearch: {
               type: "boolean",
             },
