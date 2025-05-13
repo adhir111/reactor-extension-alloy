@@ -22,6 +22,7 @@ module.exports =
       enableAdvertisingCreative,
       transactionId,
       customGoals,
+      conversions,
       ...otherSettings 
     } = settings;
     const configOverrides = getConfigOverrides(otherSettings);
@@ -76,6 +77,21 @@ module.exports =
       // Add custom goals if provided
       if (customGoals && customGoals.length > 0) {
         xdm.advertising.conversion.customGoals = customGoals;
+      }
+      
+      // Add conversions data if provided
+      if (conversions && conversions.length > 0) {
+        // Filter out any empty conversion entries
+        const validConversions = conversions.filter(
+          conversion => conversion.conversionName || conversion.revenue
+        );
+        
+        if (validConversions.length > 0) {
+          xdm.advertising.conversion.conversionTracking = validConversions.map(conversion => ({
+            conversionName: conversion.conversionName,
+            revenue: conversion.revenue ? parseFloat(conversion.revenue) || conversion.revenue : undefined
+          }));
+        }
       }
     }
 

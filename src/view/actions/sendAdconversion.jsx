@@ -16,6 +16,7 @@ import instancePicker from "../forms/instancePicker";
 import checkbox from "../forms/checkbox";
 import textField from "../forms/textField";
 import fieldArray from "../forms/fieldArray";
+import objectArray from "../forms/objectArray";
 import form from "../forms/form";
 import renderForm from "../forms/renderForm";
 import configOverrides from "../forms/configOverrides";
@@ -32,6 +33,7 @@ const wrapGetInitialValues =
       enableAdvertisingCreative = false,
       transactionId = "",
       customGoals = [""],
+      conversions = [{ conversionName: "", revenue: "" }],
       instanceName = initInfo.extensionSettings.instances[0].name,
       edgeConfigOverrides,
     } = initInfo.settings || {};
@@ -45,6 +47,7 @@ const wrapGetInitialValues =
           enableAdvertisingCreative,
           transactionId,
           customGoals,
+          conversions,
           instanceName,
           edgeConfigOverrides,
         },
@@ -62,6 +65,7 @@ const wrapGetSettings =
       enableAdvertisingCreative,
       transactionId,
       customGoals,
+      conversions,
       edgeConfigOverrides,
     } = getSettings({ values });
 
@@ -72,6 +76,7 @@ const wrapGetSettings =
       enableAdvertisingCreative,
       transactionId,
       customGoals,
+      conversions,
       edgeConfigOverrides,
     };
   };
@@ -118,6 +123,32 @@ const customGoalsField = fieldArray({
   dataElementDescription: "Provide a data element that returns an array of strings representing custom goals"
 });
 
+const conversionsField = objectArray(
+  {
+    name: "conversions",
+    label: "Conversion Tracking",
+    singularLabel: "Conversion",
+    dataElementDescription: "Provide a data element that returns an array of conversion objects with conversionName and revenue properties",
+    dataElementSupported: true,
+    horizontal: true,
+    isRowEmpty: ({ conversionName, revenue }) => conversionName === "" && revenue === "",
+  },
+  [
+    textField({
+      name: "conversionName",
+      label: "Conversion Name",
+      width: "size-3000",
+      description: "Enter the name of the conversion"
+    }),
+    textField({
+      name: "revenue",
+      label: "Revenue",
+      width: "size-3000",
+      description: "Enter the revenue amount for this conversion"
+    })
+  ]
+);
+
 const sendAdconversionForm = form(
   {
     wrapGetInitialValues,
@@ -145,7 +176,8 @@ const sendAdconversionForm = form(
           { label: "Conversion Properties" },
           [
             transactionIdField,
-            customGoalsField
+            customGoalsField,
+            conversionsField
           ]
         )
       ]

@@ -1058,6 +1058,20 @@ const createExtensionManifest = ({ version }) => {
                 type: "string"
               }
             },
+            conversions: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  conversionName: {
+                    type: "string"
+                  },
+                  revenue: {
+                    type: ["string", "number"]
+                  }
+                }
+              }
+            },
             edgeConfigOverrides: actionEdgeConfigOverridesSchema,
           },
           required: ["instanceName"],
