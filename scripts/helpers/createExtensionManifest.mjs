@@ -493,6 +493,18 @@ const createExtensionManifest = ({ version }) => {
       ],
     },
     actions: [
+      
+      {
+        displayName: "Send Ad Conversion Event",
+        name: "send-ad-conversion-event",
+        schema: {
+          $schema: "http://json-schema.org/draft-04/schema#",
+          type: "object",
+          properties: {},
+        },
+        libPath: "dist/lib/actions/sendAdConversionEvent/index.js",
+        viewPath: "actions/sendAdConversionEvent.html",
+      },
       {
         displayName: "Reset event merge ID",
         name: "reset-event-merge-id",
