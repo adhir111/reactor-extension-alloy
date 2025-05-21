@@ -23,6 +23,7 @@ export const bridge = {
   getInstanceDefaults: () => ({
     id5Enabled: false,
     rampIdEnabled: false,
+    autoClickCollectionEnabled: false,
   }),
   getInitialInstanceValues: ({ instanceSettings }) => {
     const instanceValues = {};
@@ -31,7 +32,7 @@ export const bridge = {
       toObj: instanceValues,
       fromObj: instanceSettings,
       defaultsObj: bridge.getInstanceDefaults(),
-      keys: ["id5Enabled", "rampIdEnabled"],
+      keys: ["id5Enabled", "rampIdEnabled", "autoClickCollectionEnabled"],
     });
 
     return instanceValues;
@@ -44,7 +45,7 @@ export const bridge = {
         toObj: instanceSettings,
         fromObj: instanceValues,
         defaultsObj: bridge.getInstanceDefaults(),
-        keys: ["id5Enabled", "rampIdEnabled"],
+        keys: ["id5Enabled", "rampIdEnabled", "autoClickCollectionEnabled"],
       });
     }
 
@@ -80,6 +81,14 @@ const AdvertisingSection = ({ instanceFieldName }) => {
           width="size-5000"
         >
           Enable RampID
+        </FormikCheckbox>
+        <FormikCheckbox
+          data-test-id="autoClickCollectionEnabledField"
+          name={`${instanceFieldName}.autoClickCollectionEnabled`}
+          description="Automatically tracks click-throughs."
+          width="size-5000"
+        >
+          Enable Click Through Tracking
         </FormikCheckbox>
       </FormElementContainer>
     </>

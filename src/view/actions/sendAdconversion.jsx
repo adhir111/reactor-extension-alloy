@@ -10,7 +10,8 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 import React, { useEffect, useState } from "react";
-import { object } from "yup";
+import { object, string } from "yup";
+import { useFormikContext, useField } from 'formik';
 
 import instancePicker from "../forms/instancePicker";
 import checkbox from "../forms/checkbox";
@@ -98,6 +99,9 @@ const wrapGetInitialValues =
       edgeConfigOverrides,
     } = initInfo.settings || {};
 
+    console.log("initInfo", initInfo);
+    console.log("initInfo.settings", initInfo.settings);
+
     return getInitialValues({
       initInfo: {
         ...initInfo,
@@ -131,6 +135,10 @@ const wrapGetSettings =
       edgeConfigOverrides,
     } = getSettings({ values });
 
+    console.log("values", values);
+    console.log("settings", getSettings({ values }));
+    
+
     return {
       instanceName,
       advertiserId,
@@ -163,11 +171,14 @@ const advertiserField = {
     };
   },
   validationShape: {
-    advertiserId: object(),
+    advertiserId: string(),
   },
   Component: ({ namePrefix = "" }) => {
     const [advertisers, setAdvertisers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    
+    // Get the current value from Formik
+    const [{ value: currentValue }, , { setValue }] = useField(`${namePrefix}advertiserId`);
 
     useEffect(() => {
       let mounted = true;
@@ -178,6 +189,16 @@ const advertiserField = {
           if (mounted) {
             setAdvertisers(data);
             setIsLoading(false);
+            
+            // If we're editing and have a matching advertiser, update the display
+            if (currentValue) {
+              const found = data.find(adv => adv.id === currentValue);
+              if (!found && currentValue) {
+                // If we have a value but no matching advertiser (rare edge case),
+                // use the ID as the display until we can load the real data
+                console.log(`No matching advertiser found for ID: ${currentValue}`);
+              }
+            }
           }
         } catch (error) {
           console.error("Error loading advertisers:", error);
@@ -192,11 +213,11 @@ const advertiserField = {
       return () => {
         mounted = false;
       };
-    }, []);
+    }, [currentValue, setValue]);
 
-    // Create placeholder item for loading state
+    // During loading state, always show "Loading advertisers..."
     const items = isLoading 
-      ? [{ value: "", label: "Loading advertisers..." }] 
+      ? [{ value: currentValue || "", label: "Loading advertisers..." }] 
       : advertisers.map(advertiser => ({
           value: advertiser.id,
           label: advertiser.name
@@ -286,13 +307,27 @@ const sendAdconversionForm = form(
   },
   [
     instancePicker({ name: "instanceName" }),
-    advertiserField,
     section(
       { label: "Advertising Conversion Types" },
       [
         enableAdvertisingSearchField,
         enableAdvertisingDisplayField,
         enableAdvertisingCreativeField,
+      ]
+    ),
+    conditional(
+      {
+        args: ["enableAdvertisingDisplay", "enableAdvertisingCreative"],
+        condition: (enableAdvertisingDisplay, enableAdvertisingCreative) => 
+          enableAdvertisingDisplay || enableAdvertisingCreative,
+      },
+      [
+        section(
+          { label: "Advertiser Selection", includeTopBorder: true },
+          [
+            advertiserField,
+          ]
+        ),
       ]
     ),
     conditional(
@@ -311,7 +346,6 @@ const sendAdconversionForm = form(
         )
       ]
     ),
-    configOverrideFields,
   ]
 );
 

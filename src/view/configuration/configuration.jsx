@@ -48,15 +48,18 @@ import PrivacySection, {
 import IdentitySection, {
   bridge as identitySectionBridge,
 } from "./identitySection";
-import AdvertisingSection, {
-  bridge as advertisingSectionBridge,
-} from "./advertisingSection";
 import PersonalizationSection, {
   bridge as personalizationSectionBridge,
 } from "./personalizationSection";
 import DataCollectionSection, {
   bridge as dataCollectionSectionBridge,
 } from "./dataCollectionSection";
+import StreamingMediaSection, {
+  bridge as mediaBridge,
+} from "./streamingMediaSection";
+import AdvertisingSection, {
+  bridge as advertisingSectionBridge,
+} from "./advertisingSection";
 import OverridesSection, {
   bridge as overridesBridge,
 } from "../components/overrides";
@@ -65,9 +68,6 @@ import AdvancedSection, {
 } from "./advancedSection";
 import getEdgeConfigIds from "../utils/getEdgeConfigIds";
 import { FIELD_NAMES } from "../components/overrides/utils";
-import StreamingMediaSection, {
-  bridge as mediaBridge,
-} from "./streamingMediaSection";
 import ComponentsSection, {
   bridge as componentsBridge,
 } from "./componentsSection";
@@ -77,12 +77,12 @@ const sectionBridges = [
   edgeConfigurationsSectionBridge,
   privacySectionBridge,
   identitySectionBridge,
-  advertisingSectionBridge,
   personalizationSectionBridge,
   dataCollectionSectionBridge,
+  mediaBridge,
+  advertisingSectionBridge,
   overridesBridge,
   advancedSectionBridge,
-  mediaBridge,
 ];
 
 /**
@@ -236,9 +236,6 @@ const InstancesSection = ({ initInfo, context }) => {
                         <IdentitySection
                           instanceFieldName={instanceFieldName}
                         />
-                        <AdvertisingSection
-                          instanceFieldName={instanceFieldName}
-                        />
                         <PersonalizationSection
                           instanceFieldName={instanceFieldName}
                         />
@@ -246,6 +243,9 @@ const InstancesSection = ({ initInfo, context }) => {
                           instanceFieldName={instanceFieldName}
                         />
                         <StreamingMediaSection
+                          instanceFieldName={instanceFieldName}
+                        />
+                        <AdvertisingSection
                           instanceFieldName={instanceFieldName}
                         />
                         <OverridesSection

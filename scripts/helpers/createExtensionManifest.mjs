@@ -1030,7 +1030,7 @@ const createExtensionManifest = ({ version }) => {
         viewPath: "actions/evaluateRulesets.html",
       },
       {
-        displayName: "Send Adconversion",
+        displayName: "Send Ad Conversion",
         name: "send-adconversion",
         schema: {
           $schema: "http://json-schema.org/draft-04/schema#",
